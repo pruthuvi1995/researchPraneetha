@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "112398149255",
+    "project_id": "researchpraneetha-416e9",
+    "storage_bucket": "researchpraneetha-416e9.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:112398149255:android:9549d4d93ac2ee5bfbfa22",
+        "android_client_info": {
+          "package_name": "com.example.research_praneetha"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "112398149255-uch20f4of5nvn6g22l5nmb3rb9obj7hq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBYg32kU_DXd2jkP8OcMFyYO-R9jeKFp9I"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "112398149255-uch20f4of5nvn6g22l5nmb3rb9obj7hq.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
