@@ -1,6 +1,8 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:research_praneetha/providers/letters.dart';
+import 'package:research_praneetha/screens/receivePost/receive_post_screen.dart';
 import 'package:research_praneetha/screens/sendPost/confirm_receiver_details_screen.dart';
 // import 'package:research_praneetha/screens/postDetails/details_screen.dart';
 import './screens/home/home_screen.dart';
@@ -27,18 +29,24 @@ class MyApp extends StatelessWidget {
         ChangeNotifierProvider.value(
           value: Auth(),
         ),
+        ChangeNotifierProvider.value(
+          value: Letters(),
+        ),
       ],
       child: Consumer<Auth>(
         builder: (ctx, auth, _) => MaterialApp(
+            debugShowCheckedModeBanner: false,
             title: 'Praneetha',
             theme: theme(),
-            // home: auth.isAuth ? HomeScreen() : SignInScreen(),
-            home: HomeScreen(),
+            // home: SignInScreen(),
+            home: auth.isAuth ? HomeScreen() : SignInScreen(),
+            // home: HomeScreen(),
             routes: {
               RegisterScreen.routeName: (ctx) => RegisterScreen(),
               SendPostScreen.routeName: (ctx) => SendPostScreen(),
               ConfirmReceiverDetailsScreen.routeName: (ctx) =>
                   ConfirmReceiverDetailsScreen(),
+              ReceivePostScreen.routeName: (ctx) => ReceivePostScreen(),
             }),
       ),
     );

@@ -1,5 +1,9 @@
 import 'dart:convert';
 import 'dart:io';
+import '../../providers/user.dart';
+
+import '../../database.dart';
+import '../../models/http_exception.dart';
 
 // import '../providers/auth.dart';
 
@@ -24,6 +28,18 @@ class _RegisterFormState extends State<RegisterForm> {
   final _formKey = GlobalKey<FormState>();
   RegisterMode _registerMode = RegisterMode.Name;
   var _isLoading = false;
+
+  Database db;
+  initialise() {
+    db = Database();
+    db.initiliase();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initialise();
+  }
 
   Map<String, String> _registerData = {
     "firstName": "",
@@ -66,37 +82,59 @@ class _RegisterFormState extends State<RegisterForm> {
     setState(() {
       _isLoading = true;
     });
-
-    try {
-      if (_registerMode == RegisterMode.Address) {
+    if (_registerMode == RegisterMode.Address) {
+      try {
         await Provider.of<Auth>(context, listen: false)
             .register(_registerData['email'], _registerData['password']);
-      }
-    } on HttpException catch (error) {
-      var errorMessage = 'Could not authenticate you. Please try again later';
-      if (error.toString().contains('EMAIL_EXISTS')) {
-        errorMessage = 'This email address is already in use';
-      } else if (error.toString().contains('INVALID_EMAIL')) {
-        errorMessage = 'This is not a valid email';
-      } else if (error.toString().contains('WEAK_PASSWORD')) {
-        errorMessage = 'This password is too weak.';
-      } else if (error.toString().contains('EMAIL_NOT_FOUND')) {
-        errorMessage = 'Could not find a user with thatb email.';
-      } else if (error.toString().contains('INVALID_PASSWORD')) {
-        errorMessage = 'Invalid password';
-      } else {
-        errorMessage = 'Authentication failed';
-      }
-      print('11111111111111111');
+      } on HttpException catch (error) {
+        var errorMessage =
+            'Could no t authenticate you. Please try again later';
+        if (error.toString().contains('EMAIL_EXISTS')) {
+          errorMessage = 'This email address is already in use';
+        } else if (error.toString().contains('INVALID_EMAIL')) {
+          errorMessage = 'This is not a valid email';
+        } else if (error.toString().contains('WEAK_PASSWORD')) {
+          errorMessage = 'This password is too weak.';
+        } else if (error.toString().contains('EMAIL_NOT_FOUND')) {
+          errorMessage = 'Could not find a user with thatb email.';
+        } else if (error.toString().contains('INVALID_PASSWORD')) {
+          errorMessage = 'Invalid password';
+        } else {
+          errorMessage = 'Authentication failed';
+        }
 
-      errorMsg = errorMessage;
-      _showErrorDialog(errorMessage);
-    } catch (error) {
-      print(error);
-      const errorMessage = 'Could not authenticate you. Please try again later';
-      errorMsg = errorMessage;
-      _showErrorDialog(errorMessage);
+        errorMsg = errorMessage;
+        _showErrorDialog(errorMessage);
+      } catch (error) {
+        const errorMessage =
+            'Could not authenticate you. Please try again later';
+        errorMsg = errorMessage;
+        _showErrorDialog(errorMessage);
+      }
+
+      try {
+        await db.createUserDetails(
+          _registerData['address'],
+          _registerData['email'],
+          _registerData['firstName'],
+          _registerData['lastName'],
+          _registerData['postBoxNo'],
+        );
+      } catch (error) {
+        const errorMessage =
+            'Could not authenticate you. Please try again later';
+        errorMsg = errorMessage;
+        _showErrorDialog(errorMessage);
+      }
     }
+
+    // Provider.of<Auth>(context).user = User(
+    //   fName: _registerData['firstName'],
+    //   lName: _registerData['lastName'],
+    //   email: _registerData['email'],
+    //   address: _registerData['address'],
+    //   postBoxNo: _registerData['postBoxNo'],
+    // );
 
     setState(() {
       _isLoading = false;
@@ -203,7 +241,9 @@ class _RegisterFormState extends State<RegisterForm> {
                       height: getProportionateScreenHeight(30),
                     ),
                     DefaultButton(
-                      text: 'Next',
+                      text: _registerMode == RegisterMode.Final
+                          ? 'Try again'
+                          : 'Next',
                       press: () => {
                         (_isLoading) ? CircularProgressIndicator() : _submit()
                       },

@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:research_praneetha/providers/auth.dart';
 
 import '../../constants.dart';
 import '../../database.dart';
@@ -20,6 +22,7 @@ class BodyConfirmReceiverDetailsScreen extends StatefulWidget {
 class _BodyConfirmReceiverDetailsScreenState
     extends State<BodyConfirmReceiverDetailsScreen> {
   Mode _mode = Mode.ConfirmDetails;
+  var _isLoading = false;
   Database db;
   initialise() {
     db = Database();
@@ -58,7 +61,8 @@ class _BodyConfirmReceiverDetailsScreenState
     final email = widget.userDetails[2];
     final postBoxId = widget.userDetails[3];
     final address = widget.userDetails[4];
-    final senderEmailAddress = 'dilani@gmail.com';
+    final senderEmailAddress = Provider.of<Auth>(context).email;
+    ;
     final placeId = '123456789';
 
     return SafeArea(
@@ -121,15 +125,13 @@ class _BodyConfirmReceiverDetailsScreenState
                             fit: FlexFit.tight,
                             child: GestureDetector(
                               onTap: () async {
-                                final isAdded = await db.createAPost(
-                                    senderEmailAddress, email, 'home', placeId);
-                                print(isAdded);
-                                isAdded
-                                    ? _showErrorDialog(
-                                        'Your mail is successfully send.',
-                                        'Please inform the receiver.')
-                                    : _showErrorDialog('There is an error.',
-                                        'Try again later.');
+                                await db.createPost(senderEmailAddress, email,
+                                    'Sender\'s home', placeId);
+                                setState(() {
+                                  _showErrorDialog(
+                                      'You are successfully send the mail.',
+                                      'Please inform the receiver.');
+                                });
                               },
                               child: Container(
                                 margin: EdgeInsets.only(
@@ -168,7 +170,7 @@ class _BodyConfirmReceiverDetailsScreenState
                       FlatButton(
                           onPressed: () {
                             Navigator.of(context).pop();
-                            Navigator.of(context).pop();
+                            // Navigator.of(context).pop();
                             // Navigator.pushNamed(context, SendPostScreen.routeName);
                           },
                           child: Text('OK'))

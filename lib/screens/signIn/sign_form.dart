@@ -1,4 +1,6 @@
 import 'package:provider/provider.dart';
+import 'package:research_praneetha/providers/user.dart';
+import '../../database.dart';
 import '../../providers/auth.dart';
 
 import '../../models/http_exception.dart';
@@ -27,6 +29,18 @@ class _SignFormState extends State<SignForm> {
   // String password;
 
   var _isLoading = false;
+
+  Database db;
+  initialise() {
+    db = Database();
+    db.initiliase();
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    initialise();
+  }
 
   void _showErrorDialog(String message) {
     showDialog(
@@ -75,12 +89,31 @@ class _SignFormState extends State<SignForm> {
       } else {
         errorMessage = 'Authentication failed';
       }
-      print(errorMessage);
+
       _showErrorDialog(errorMessage);
     } catch (error) {
       const errorMessage = 'Could not authenticate you. Please try again later';
       _showErrorDialog(errorMessage);
     }
+    var data;
+
+    try {
+      data = await db.getUserDetails(_loginData['email'], context);
+      print('11111');
+      print(data);
+    } catch (error) {
+      const errorMessage = 'Could not authenticate you. Please try again later';
+
+      _showErrorDialog(errorMessage);
+    }
+
+    // Provider.of<Auth>(context).user = User(
+    //   fName: data['firstName'],
+    //   lName: data['lastName'],
+    //   email: data['email'],
+    //   address: data['address'],
+    //   postBoxNo: data['postBoxId'],
+    // );
 
     setState(() {
       _isLoading = false;
@@ -95,7 +128,7 @@ class _SignFormState extends State<SignForm> {
     return Form(
         key: _formKey,
         child: Column(children: <Widget>[
-          buildNICNoFormField(),
+          buildEMailFormField(),
           SizedBox(
             height: getProportionateScreenHeight(25),
           ),
@@ -117,7 +150,7 @@ class _SignFormState extends State<SignForm> {
         ]));
   }
 
-  TextFormField buildNICNoFormField() {
+  TextFormField buildEMailFormField() {
     return TextFormField(
       keyboardType: TextInputType.name,
       onSaved: (value) => _loginData['email'] = value,
@@ -127,7 +160,7 @@ class _SignFormState extends State<SignForm> {
         floatingLabelBehavior: FloatingLabelBehavior.always,
       ),
       validator: (value) {
-        if (value.isEmpty) {
+        if (value.isEmpty || !value.contains('@')) {
           return 'Input the correct email';
         }
       },

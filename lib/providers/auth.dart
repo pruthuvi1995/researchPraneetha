@@ -1,14 +1,24 @@
 import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
+import '../database.dart';
 import '../models/http_exception.dart';
+import 'user.dart';
 
 class Auth with ChangeNotifier {
   String _token;
   DateTime _expiryDate;
   String _userId;
+  String email;
+
+  FirebaseFirestore fireStore;
+  initiliase() {
+    fireStore = FirebaseFirestore.instance;
+  }
 
   bool get isAuth {
+    print(token != null);
     return token != null;
   }
 
@@ -22,8 +32,9 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> register(String email, String password) async {
+    this.email = email;
     const url =
-        'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyAMajLZXHrh6KtHCPm6ZMPW3s6bq2TJ99c';
+        'https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=AIzaSyBYg32kU_DXd2jkP8OcMFyYO-R9jeKFp9I';
     try {
       final response = await http.post(
         Uri.parse(url),
@@ -35,12 +46,9 @@ class Auth with ChangeNotifier {
           },
         ),
       );
-
       final responseData = json.decode(response.body);
-      print('111111222222222221');
-
+      print(responseData);
       if (responseData['error'] != null) {
-        print(responseData['error']['message']);
         throw HttpException(responseData['error']['message']);
       }
 
@@ -58,8 +66,9 @@ class Auth with ChangeNotifier {
   }
 
   Future<void> login(String email, String password) async {
+    this.email = email;
     const url =
-        'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyAMajLZXHrh6KtHCPm6ZMPW3s6bq2TJ99c';
+        'https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=AIzaSyBYg32kU_DXd2jkP8OcMFyYO-R9jeKFp9I';
     try {
       final response = await http.post(
         Uri.parse(url),
@@ -72,7 +81,7 @@ class Auth with ChangeNotifier {
         ),
       );
       final responseData = json.decode(response.body);
-
+      print(responseData);
       if (responseData['error'] != null) {
         throw HttpException(responseData['error']['message']);
       }
@@ -88,22 +97,5 @@ class Auth with ChangeNotifier {
     } catch (error) {
       throw error;
     }
-  }
-
-  Future<void> addUserDetails(String fName, String lName, String email,
-      String postBoxNo, String address) async {
-    const url =
-        'https://researchpraneetha-default-rtdb.firebaseio.com/userDetails.json';
-    final response = await http.post(
-      Uri.parse(url),
-      body: json.encode({
-        'fName': fName,
-        'lName': lName,
-        'email': email,
-        'postBoxNo': postBoxNo,
-        'address': address,
-      }),
-    );
-    print(json.decode(response.body));
   }
 }

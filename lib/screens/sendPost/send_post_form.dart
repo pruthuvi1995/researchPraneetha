@@ -66,10 +66,6 @@ class _SendPostFormState extends State<SendPostForm> {
       _isLoading = true;
     });
 
-    setState(() {
-      _isLoading = false;
-    });
-
     _switchAuthMode();
 
     if (_detailsMode == DetailsMode.Final) {
@@ -91,6 +87,9 @@ class _SendPostFormState extends State<SendPostForm> {
               userDetails['address'],
             ]);
       }
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -138,7 +137,7 @@ class _SendPostFormState extends State<SendPostForm> {
       onSaved: (value) => _detailsData['email'] = value,
       decoration: InputDecoration(
         labelText: 'e-mail',
-        hintText: 'Enter your e-mail address',
+        hintText: 'E-mail of the receiver',
         floatingLabelBehavior: FloatingLabelBehavior.always,
       ),
       validator: (value) {
